@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html {
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20200714/pngtree-modern-double-color-futuristic-neon-background-image_351866.jpg');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+        }   
+
+        .videocam {
+            width: 50%;
+            border: 5px solid rgb(50, 14, 14);
+            border-radius: 1vw;
+        }
+
+        .main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vw;
+            height: 100vh;
+        }
+
+        .toggle-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgb(47, 169, 100);
+            padding: 10px;
+            cursor: pointer;
+            border: 2px solid #333;
+            border-radius: 5px;
+        }
+    </style>
+    <title>camera-preview</title>
+</head>
+<body>
+    <div class="main">
+        <video id="camera-preview" class="videocam" autoplay></video>
+        <button class="toggle-button" onclick="toggleCamera()">Toggle Camera</button>
+    </div>
+    <script>
+        let currentFacingMode = 'environment';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('camera-preview');
+
+            // Ensure getUserMedia is available in the browser
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Request access to the user's camera
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
+                    .then((stream) => {
+                        // Assign the stream to the video element
+                        video.srcObject = stream;
+                    })
+                    .catch((error) => {
+                        console.error('Error accessing camera:', error);
+                    });
+            } else {
+                console.error('getUserMedia is not supported in this browser');
+            }
+        });
+
+        function toggleCamera() {
+            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
+                .then((stream) => {
+                    const video = document.getElementById('camera-preview');
+                    const oldStream = video.srcObject;
+                    
+                    // Stop the old stream and assign the new stream to the video element
+                    if (oldStream) {
+                        const tracks = oldStream.getTracks();
+                        tracks.forEach(track => track.stop());
+                    }
+                    
+                    video.srcObject = stream;
+                })
+                .catch((error) => {
+                    console.error('Error toggling camera:', error);
+                });
+        }
+    </script>
+</body>
+</html>
